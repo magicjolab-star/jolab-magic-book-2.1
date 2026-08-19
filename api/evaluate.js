@@ -1,46 +1,175 @@
+const MODELS = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
+
+const RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    evaluation_ia: {
+      type: 'object',
+      properties: {
+        verdict_interne: { type: 'string' },
+        blue_book: {
+          type: 'object',
+          properties: {
+            valeur_officielle: { type: 'integer' },
+            commentaire_ia: { type: 'string' }
+          },
+          required: ['valeur_officielle', 'commentaire_ia'],
+          additionalProperties: false
+        },
+        prix_echange_concessionnaire: {
+          type: 'object',
+          properties: {
+            montant: { type: 'integer' },
+            argument_de_negociation: { type: 'string' }
+          },
+          required: ['montant', 'argument_de_negociation'],
+          additionalProperties: false
+        },
+        prix_marche_particulier: {
+          type: 'object',
+          properties: {
+            montant: { type: 'integer' },
+            realite_du_marche: { type: 'string' }
+          },
+          required: ['montant', 'realite_du_marche'],
+          additionalProperties: false
+        },
+        comparables_quebec: {
+          type: 'array',
+          minItems: 3,
+          maxItems: 3,
+          items: {
+            type: 'object',
+            properties: {
+              plateforme: { type: 'string' },
+              titre_annonce: { type: 'string' },
+              prix_affiche: { type: 'integer' }
+            },
+            required: ['plateforme', 'titre_annonce', 'prix_affiche'],
+            additionalProperties: false
+          }
+        }
+      },
+      required: [
+        'verdict_interne',
+        'blue_book',
+        'prix_echange_concessionnaire',
+        'prix_marche_particulier',
+        'comparables_quebec'
+      ],
+      additionalProperties: false
+    }
+  },
+  required: ['evaluation_ia'],
+  additionalProperties: false
+};
+
+function normalizeBody(req) {
+  if (!req.body) return {};
+  if (typeof req.body === 'string') {
+    try { return JSON.parse(req.body); } catch (_) { return {}; }
+  }
+  return req.body;
+}
+
+function buildPrompt(body) {
+  return `Tu es un évaluateur professionnel de véhicules de loisirs au Québec pour une équipe de vente.\n\nVéhicule : ${body.annee || ''} ${body.marque || ''} ${body.modele || ''}\nMillage / heures : ${body.millage || '0'}\nCondition : ${body.condition || 'Moyen'}\nAccessoires : ${body.accessoires || 'Aucun'}\n\nProduis une estimation réaliste en dollars canadiens (CAD) comprenant :\n- une valeur de référence de type livre bleu estimée;\n- un prix d'échange concessionnaire prudent mais défendable;\n- une valeur de détail réaliste;\n- exactement 3 comparables québécois indicatifs.\n\nNe prétends jamais avoir consulté ou vérifié des annonces en temps réel. Les comparables sont des exemples indicatifs fondés sur le marché. Sois concis, professionnel, utile à la négociation et évite les affirmations trompeuses.`;
+}
+
+function extractText(data) {
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  return parts
+    .filter(part => !part?.thought && typeof part?.text === 'string')
+    .map(part => part.text)
+    .join('')
+    .trim();
+}
+
+async function callGemini(model, apiKey, prompt) {
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      signal: AbortSignal.timeout(30000),
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseJsonSchema: RESPONSE_SCHEMA,
+          maxOutputTokens: 4096,
+          thinkingConfig: { thinkingLevel: 'low' }
+        }
+      })
+    }
+  );
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data?.error?.message || `Gemini HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+
+  const text = extractText(data);
+  if (!text) throw new Error('Gemini a retourné une réponse vide.');
+
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    throw new Error(`Réponse JSON Gemini invalide: ${error.message}`);
+  }
+
+  if (!parsed?.evaluation_ia) throw new Error('Structure JSON Gemini incomplète.');
+  return parsed;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Methode non permise.' });
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Méthode non permise.' });
+  }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY manquante.' });
+  if (!apiKey) {
+    console.error('GEMINI_API_KEY manquante dans Vercel.');
+    return res.status(500).json({ error: 'Configuration IA manquante.' });
+  }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-  const models = (process.env.GEMINI_MODELS || 'gemini-3.6-flash,gemini-2.5-flash')
-    .split(',').map(v => v.trim()).filter(Boolean);
+  const body = normalizeBody(req);
+  if (!body.modele || !body.annee || !body.marque) {
+    return res.status(400).json({ error: 'Marque, modèle et année sont requis.' });
+  }
 
-  const prompt = `Tu es un evaluateur de vehicules recreatifs au Quebec. Evalue ${body.annee || ''} ${body.marque || ''} ${body.modele || ''}. Millage/heures: ${body.millage || '0'}. Condition: ${body.condition || 'Moyen'}. Accessoires: ${body.accessoires || 'Aucun'}. Retourne uniquement un JSON valide sous la forme {"evaluation_ia":{"verdict_interne":"","blue_book":{"valeur_officielle":0,"commentaire_ia":""},"prix_echange_concessionnaire":{"montant":0,"argument_de_negociation":""},"prix_marche_particulier":{"montant":0,"realite_du_marche":""},"comparables_quebec":[{"plateforme":"","titre_annonce":"","prix_affiche":0},{"plateforme":"","titre_annonce":"","prix_affiche":0},{"plateforme":"","titre_annonce":"","prix_affiche":0}]}}. Tous les montants sont en dollars canadiens. Les comparables sont indicatifs, ne pretends pas les avoir verifies.`;
+  const prompt = buildPrompt(body);
+  const errors = [];
 
-  let lastError;
-  for (const model of models) {
+  for (const model of MODELS) {
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 1800 }
-        })
+      const parsed = await callGemini(model, apiKey, prompt);
+      return res.status(200).json({
+        ...parsed,
+        meta: {
+          model,
+          generated_at: new Date().toISOString(),
+          version: '3.0.1'
+        }
       });
-      const data = await response.json();
-      if (!response.ok) {
-        const err = new Error(data?.error?.message || response.statusText);
-        err.status = response.status;
-        throw err;
-      }
-      let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      text = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
-      const first = text.indexOf('{');
-      const last = text.lastIndexOf('}');
-      if (first >= 0 && last > first) text = text.slice(first, last + 1);
-      const parsed = JSON.parse(text);
-      if (!parsed?.evaluation_ia) throw new Error('Structure JSON incomplete.');
-      return res.status(200).json({ ...parsed, meta: { model, generated_at: new Date().toISOString() } });
     } catch (error) {
-      lastError = error;
+      errors.push({ model, status: error?.status || null, message: error?.message || String(error) });
+      console.error(`Gemini model failure (${model}):`, error);
     }
   }
 
-  console.error('Gemini evaluation error:', lastError);
-  return res.status(502).json({ error: 'Impossible de produire l evaluation pour le moment.' });
+  console.error('Gemini evaluation failed for all models:', errors);
+  return res.status(502).json({
+    error: "Impossible de produire l'évaluation pour le moment. Réessaie dans quelques secondes."
+  });
 };
