@@ -9,3 +9,5 @@ Trusted Web Activity (TWA) pour `https://jolab-magic-book-20.vercel.app/`.
 - Android Browser Helper : 2.6.2
 
 Le bundle signé est généré par GitHub Actions. La clé d'importation (upload key) doit être conservée en lieu sûr pour les futures mises à jour.
+
+Build Play Store déclenché le 2026-08-19.
