@@ -6,7 +6,7 @@ module.exports = async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY manquante.' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-  const models = (process.env.GEMINI_MODELS || 'gemini-3.7-flash,gemini-3.6-flash')
+  const models = (process.env.GEMINI_MODELS || 'gemini-3.6-flash,gemini-2.5-flash')
     .split(',').map(v => v.trim()).filter(Boolean);
 
   const prompt = `Tu es un evaluateur de vehicules recreatifs au Quebec. Evalue ${body.annee || ''} ${body.marque || ''} ${body.modele || ''}. Millage/heures: ${body.millage || '0'}. Condition: ${body.condition || 'Moyen'}. Accessoires: ${body.accessoires || 'Aucun'}. Retourne uniquement un JSON valide sous la forme {"evaluation_ia":{"verdict_interne":"","blue_book":{"valeur_officielle":0,"commentaire_ia":""},"prix_echange_concessionnaire":{"montant":0,"argument_de_negociation":""},"prix_marche_particulier":{"montant":0,"realite_du_marche":""},"comparables_quebec":[{"plateforme":"","titre_annonce":"","prix_affiche":0},{"plateforme":"","titre_annonce":"","prix_affiche":0},{"plateforme":"","titre_annonce":"","prix_affiche":0}]}}. Tous les montants sont en dollars canadiens. Les comparables sont indicatifs, ne pretends pas les avoir verifies.`;
@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.2, maxOutputTokens: 1800 }
+          generationConfig: { maxOutputTokens: 1800 }
         })
       });
       const data = await response.json();
