@@ -1,11 +1,5 @@
-const CACHE_NAME = 'magic-book-v303';
-const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest?v=303',
-  '/icons/magic-book-v3-192.jpg?v=303',
-  '/icons/magic-book-v3-512.jpg?v=303'
-];
+const CACHE_NAME = 'magic-book-v304';
+const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest?v=304'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
@@ -22,8 +16,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.startsWith('/api/')) return;
-  if (event.request.method !== 'GET') return;
+  if (url.pathname.startsWith('/api/') || event.request.method !== 'GET') return;
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -38,7 +31,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (url.pathname === '/manifest.webmanifest' || url.pathname.startsWith('/icons/')) {
+  if (url.pathname === '/manifest.webmanifest') {
     event.respondWith(
       fetch(event.request, { cache: 'reload' })
         .then(response => {
@@ -51,7 +44,5 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
-  );
+  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
 });
