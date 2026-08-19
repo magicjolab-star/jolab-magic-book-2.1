@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.magicjolab.magicbook",
+      "sha256_cert_fingerprints": [
+        "7B:B7:D0:5C:E5:04:05:38:3F:C8:FC:D3:39:A2:18:99:50:97:21:8A:CA:9E:A9:86:8C:F2:3F:48:EC:3D:91:AE"
+      ]
+    }
+  }
+]
