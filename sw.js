@@ -1,1 +1,57 @@
-const C='magic-book-v302',A=['/','/index.html','/manifest.webmanifest','/icons/magic-book-v3-final-192.jpg','/icons/magic-book-v3-final-512.avif'];self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.origin!==location.origin||u.pathname.startsWith('/api/')||e.request.method!=='GET')return;if(e.request.mode==='navigate'){e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{const x=r.clone();caches.open(C).then(c=>c.put('/index.html',x));return r}).catch(()=>caches.match('/index.html')));return}if(u.pathname.includes('magic-book-v3-final-')){e.respondWith(fetch(e.request,{cache:'reload'}).then(r=>{const x=r.clone();caches.open(C).then(c=>c.put(e.request,x));return r}).catch(()=>caches.match(e.request)));return}e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});
+const CACHE_NAME = 'magic-book-v303';
+const APP_SHELL = [
+  '/',
+  '/index.html',
+  '/manifest.webmanifest?v=303',
+  '/icons/magic-book-v3-192.jpg?v=303',
+  '/icons/magic-book-v3-512.jpg?v=303'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
+  if (event.request.method !== 'GET') return;
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put('/index.html', copy));
+          return response;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  if (url.pathname === '/manifest.webmanifest' || url.pathname.startsWith('/icons/')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'reload' })
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request))
+  );
+});
