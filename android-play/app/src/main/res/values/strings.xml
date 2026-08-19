@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Magic Book</string>
+    <string name="launch_url">https://jolab-magic-book-20.vercel.app/?source=play</string>
+    <string name="asset_statements">[{\"relation\":[\"delegate_permission/common.handle_all_urls\"],\"target\":{\"namespace\":\"web\",\"site\":\"https://jolab-magic-book-20.vercel.app\"}}]</string>
+</resources>
