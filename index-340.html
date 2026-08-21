@@ -4,26 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#050a15">
-  <meta name="application-version" content="3.4.0">
+  <meta name="application-version" content="3.5.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Magic Book">
   <meta name="description" content="Magic Book — évaluateur d'échange intelligent pour véhicules de loisirs.">
-  <link rel="manifest" href="/manifest.webmanifest?v=340">
-  <link rel="icon" type="image/webp" sizes="192x192" href="/api/visual?size=192&v=340">
-  <link rel="apple-touch-icon" href="/api/visual?size=192&v=340">
-  <title>Magic Book 3.4</title>
+  <link rel="manifest" href="/manifest.webmanifest?v=350">
+  <link rel="icon" type="image/webp" sizes="192x192" href="/api/visual?size=192&v=350">
+  <link rel="apple-touch-icon" href="/api/visual?size=192&v=350">
+  <title>Magic Book 3.5</title>
   <link rel="stylesheet" href="/style-330.css?v=330">
-  <link rel="stylesheet" href="/accessory-340.css?v=340">
+  <link rel="stylesheet" href="/accessory-350.css?v=350">
 </head>
 <body>
 <main class="app">
   <header class="head">
-    <img class="hero" src="/api/visual?size=512&v=340" alt="Magic Book" width="512" height="512" decoding="async" fetchpriority="high">
+    <img class="hero" src="/api/visual?size=512&v=350" alt="Magic Book" width="512" height="512" decoding="async" fetchpriority="high">
     <h1>MAGIC BOOK</h1>
     <div class="sub" data-i18n="subtitle">Évaluateur d'échange intelligent pour véhicules de loisirs</div>
-    <div class="version">Version 3.4.0</div>
+    <div class="version">Version 3.5.0</div>
     <a class="pro-link" href="/commercial.html" data-i18n="proLink">🏢 Professionnel? Découvrir Commercial Magic Book</a>
   </header>
 
@@ -46,6 +46,7 @@
     <div class="accessory-builder">
       <div class="accessory-builder-card">
         <div id="accTitle" class="accessory-builder-title">AJOUT D'ACCESSOIRES</div>
+        <div class="accessory-filter-bar"><div id="accVehicleType" class="accessory-detected"></div><button id="accShowAll" class="accessory-filter-toggle" type="button">Afficher toutes les catégories</button></div>
         <div class="accessory-step"><label id="accCategoryLabel" for="accCategory">CATÉGORIE</label><select id="accCategory"></select></div>
         <div class="accessory-step"><label id="accBrandLabel" for="accBrand">FOURNISSEUR / MARQUE</label><select id="accBrand" disabled></select></div>
         <div class="accessory-step"><label id="accTypeLabel" for="accType">MODÈLE / TYPE</label><select id="accType" disabled></select></div>
@@ -70,6 +71,6 @@
 </main>
 <script src="/data-330.js?v=330" defer></script>
 <script src="/app-330.js?v=330" defer></script>
-<script src="/accessory-340.js?v=340" defer></script>
+<script src="/accessory-350.js?v=350" defer></script>
 </body>
 </html>
