@@ -1,5 +1,5 @@
-const CACHE_NAME = 'magic-book-v353';
-const APP_SHELL = ['/', '/index-352.html', '/style-330.css?v=330', '/style-352.css?v=353', '/accessory-350.css?v=350', '/data-330.js?v=330', '/app-330.js?v=330', '/accessory-350.js?v=351', '/auth-352.js?v=353', '/manifest.webmanifest?v=353'];
+const CACHE_NAME = 'magic-book-v354';
+const APP_SHELL = ['/', '/index-354.html', '/style-330.css?v=330', '/style-352.css?v=354', '/accessory-350.css?v=350', '/data-330.js?v=330', '/app-330.js?v=330', '/accessory-350.js?v=351', '/auth-352.js?v=354', '/manifest.webmanifest?v=354'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
@@ -17,7 +17,7 @@ self.addEventListener('fetch', event => {
   if (url.pathname.startsWith('/api/') || event.request.method !== 'GET') return;
 
   if (event.request.mode === 'navigate') {
-    event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match('/index-352.html')));
+    event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match('/index-354.html')));
     return;
   }
 
