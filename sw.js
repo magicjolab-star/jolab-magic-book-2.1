@@ -1,5 +1,5 @@
-const CACHE_NAME = 'magic-book-v340';
-const APP_SHELL = ['/', '/index-340.html', '/style-330.css?v=330', '/accessory-340.css?v=340', '/data-330.js?v=330', '/app-330.js?v=330', '/accessory-340.js?v=340', '/manifest.webmanifest?v=340'];
+const CACHE_NAME = 'magic-book-v350';
+const APP_SHELL = ['/', '/index-340.html', '/style-330.css?v=330', '/accessory-350.css?v=350', '/data-330.js?v=330', '/app-330.js?v=330', '/accessory-350.js?v=350', '/manifest.webmanifest?v=350'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
