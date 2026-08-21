@@ -1,0 +1,44 @@
+name: Daily Magic Book Backup
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout complete repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all refs and tags
+        run: git fetch --all --tags --prune
+
+      - name: Build restorable backup
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p backup
+          git bundle create backup/Magic-Book-repository.bundle --all
+          git archive --format=zip --output=backup/Magic-Book-source.zip HEAD
+          {
+            echo "Magic Book daily backup"
+            echo "Generated UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Commit: $GITHUB_SHA"
+            echo "Branch/ref: $GITHUB_REF"
+          } > backup/BACKUP-INFO.txt
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: magic-book-daily-backup-${{ github.run_id }}
+          path: backup/
+          retention-days: 7
+          if-no-files-found: error
