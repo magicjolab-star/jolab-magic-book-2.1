@@ -1,5 +1,5 @@
-const CACHE_NAME = 'magic-book-v310';
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest?v=310'];
+const CACHE_NAME = 'magic-book-v320';
+const APP_SHELL = ['/', '/index-320.html', '/manifest.webmanifest?v=320'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
@@ -19,9 +19,9 @@ self.addEventListener('fetch', event => {
   if (event.request.mode === 'navigate') {
     event.respondWith(fetch(event.request, { cache: 'no-store' }).then(response => {
       const copy = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put('/index.html', copy));
+      caches.open(CACHE_NAME).then(cache => cache.put('/index-320.html', copy));
       return response;
-    }).catch(() => caches.match('/index.html')));
+    }).catch(() => caches.match('/index-320.html')));
     return;
   }
 
