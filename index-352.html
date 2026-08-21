@@ -4,27 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#050a15">
-  <meta name="application-version" content="3.5.2">
+  <meta name="application-version" content="3.5.3">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Magic Book">
   <meta name="description" content="Magic Book — évaluateur d'échange intelligent pour véhicules de loisirs.">
-  <link rel="manifest" href="/manifest.webmanifest?v=352">
-  <link rel="icon" type="image/webp" sizes="192x192" href="/api/visual?size=192&v=352">
-  <link rel="apple-touch-icon" href="/api/visual?size=192&v=352">
-  <title>Magic Book 3.5.2</title>
+  <link rel="manifest" href="/manifest.webmanifest?v=353">
+  <link rel="icon" type="image/webp" sizes="192x192" href="/api/visual?size=192&v=353">
+  <link rel="apple-touch-icon" href="/api/visual?size=192&v=353">
+  <title>Magic Book 3.5.3</title>
   <link rel="stylesheet" href="/style-330.css?v=330">
   <link rel="stylesheet" href="/accessory-350.css?v=350">
-  <link rel="stylesheet" href="/style-352.css?v=352">
+  <link rel="stylesheet" href="/style-352.css?v=353">
 </head>
 <body>
 <main class="app">
   <header class="head">
-    <img class="hero" src="/api/visual?size=512&v=352" alt="Magic Book" width="512" height="512" decoding="async" fetchpriority="high">
+    <img class="hero" src="/api/visual?size=512&v=353" alt="Magic Book" width="512" height="512" decoding="async" fetchpriority="high">
     <h1>MAGIC BOOK</h1>
     <div class="sub" data-i18n="subtitle">Évaluateur d'échange intelligent pour véhicules de loisirs</div>
-    <div class="version">Version 3.5.2</div>
+    <div class="version">Version 3.5.3</div>
     <a class="pro-link" href="/commercial.html" data-i18n="proLink">🏢 Professionnel? Découvrir Commercial Magic Book</a>
   </header>
 
@@ -37,16 +37,16 @@
     <div class="account-top">
       <div class="account-title-wrap">
         <div class="account-icon">✉️</div>
-        <div><h2 class="account-title">Mon Magic Book</h2><div id="accountSub" class="account-sub">Connecte-toi par courriel pour retrouver ton compte sur plusieurs appareils.</div></div>
+        <div><h2 class="account-title">Mon Magic Book</h2><div id="accountSub" class="account-sub">Connecte-toi par courriel pour retrouver tes évaluations sur tous tes appareils.</div></div>
       </div>
-      <div id="accountBadge" class="account-badge wait">● Connexion cloud à activer</div>
+      <div id="accountBadge" class="account-badge wait">● Connexion cloud</div>
     </div>
     <div id="accountForm" class="account-form">
       <div class="account-grid">
         <div class="account-field"><label id="accountEmailLabel" for="accountEmail">Adresse courriel</label><input id="accountEmail" type="email" inputmode="email" autocomplete="email" placeholder="nom@exemple.com"></div>
         <div class="account-field"><label id="accountTypeLabel" for="accountType">Type de compte</label><select id="accountType"><option value="particulier">Particulier</option><option value="professionnel">Professionnel</option></select></div>
       </div>
-      <label id="accountConsent" class="account-consent" for="marketingConsent"><input id="marketingConsent" type="checkbox"><span><strong id="accountConsentText">Oui, je souhaite recevoir les promotions, nouveautés et offres de Théo Récréo par courriel.</strong></span></label>
+      <label id="accountConsent" class="account-consent" for="marketingConsent"><input id="marketingConsent" type="checkbox"><span><strong id="accountConsentText">Oui, je souhaite recevoir les promotions, nouveautés et offres de Théo Récréo par courriel. Je pourrai me désabonner en tout temps.</strong></span></label>
       <button id="accountSubmit" class="account-submit" type="button">M’envoyer mon lien de connexion</button>
     </div>
     <div id="accountProfile" class="account-profile">
@@ -55,7 +55,7 @@
       <button id="accountLogout" class="account-logout" type="button">Déconnexion</button>
     </div>
     <div id="accountMessage" class="account-message"></div>
-    <div id="accountPrivacyText" class="account-privacy">En créant un compte, tu peux continuer à utiliser Magic Book sans accepter les communications promotionnelles. <a href="/privacy.html">Politique de confidentialité</a></div>
+    <div id="accountPrivacyText" class="account-privacy">Le compte fonctionne même sans accepter les communications promotionnelles. <a href="/privacy.html">Politique de confidentialité</a></div>
   </section>
 
   <section id="historyPanel" class="history-panel">
@@ -98,6 +98,6 @@
 <script src="/data-330.js?v=330" defer></script>
 <script src="/app-330.js?v=330" defer></script>
 <script src="/accessory-350.js?v=351" defer></script>
-<script src="/auth-352.js?v=352" defer></script>
+<script src="/auth-352.js?v=353" defer></script>
 </body>
 </html>
