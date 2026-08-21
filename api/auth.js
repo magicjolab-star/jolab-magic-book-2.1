@@ -1,4 +1,3 @@
-const APP_URL = 'https://jolab-magic-book-20.vercel.app/';
 const FALLBACK_SUPABASE_URL = 'https://ehtvkqzqijjswqvxeyeu.supabase.co';
 const FALLBACK_SUPABASE_KEY = 'sb_publishable_KW_Hn-zQ51MvSnjLIDJpnw_Aw3ZvNU6';
 
@@ -19,6 +18,11 @@ function cleanEmail(value) {
   const email = String(value || '').trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return '';
   return email;
+}
+
+function cleanOtp(value) {
+  const token = String(value || '').replace(/\D/g, '').slice(0, 6);
+  return /^\d{6}$/.test(token) ? token : '';
 }
 
 async function supabaseFetch(path, options = {}, accessToken = '') {
@@ -48,7 +52,7 @@ async function getUser(accessToken) {
 
 async function syncProfile(accessToken, user, override = {}) {
   const md = user?.user_metadata || {};
-  const accountType = override.account_type === 'professionnel' || md.user_type === 'professionnel' ? 'professionnel' : 'particulier';
+  const accountType = override.account_type === 'professionnel' || (override.account_type === undefined && md.user_type === 'professionnel') ? 'professionnel' : 'particulier';
   const marketingConsent = accountType === 'particulier' && (override.marketing_consent === true || (override.marketing_consent === undefined && md.marketing_consent === true));
   const consentAt = marketingConsent ? (override.marketing_consent_at || md.marketing_consent_at || new Date().toISOString()) : null;
   const body = [{
@@ -77,19 +81,18 @@ module.exports = async function handler(req, res) {
   const action = String(req.query?.action || 'status');
   try {
     if (req.method === 'GET' && action === 'status') {
-      return json(res, 200, { enabled: config().enabled, mode: 'email_magic_link', cloud_history: true });
+      return json(res, 200, { enabled: config().enabled, mode: 'email_otp', cloud_history: true });
     }
 
     if (req.method !== 'POST') return json(res, 405, { error: 'Method not allowed.' });
 
-    if (action === 'send-link') {
+    if (action === 'send-code' || action === 'send-link') {
       const email = cleanEmail(req.body?.email);
       if (!email) return json(res, 400, { error: 'Adresse courriel invalide.' });
       const userType = req.body?.user_type === 'professionnel' ? 'professionnel' : 'particulier';
       const marketingConsent = userType === 'particulier' && req.body?.marketing_consent === true;
       const locale = req.body?.locale === 'en' ? 'en' : 'fr';
-      const redirect = `${APP_URL}?auth=callback`;
-      await supabaseFetch(`/auth/v1/otp?redirect_to=${encodeURIComponent(redirect)}`, {
+      await supabaseFetch('/auth/v1/otp', {
         method: 'POST',
         body: JSON.stringify({
           email,
@@ -103,7 +106,45 @@ module.exports = async function handler(req, res) {
           }
         })
       });
-      return json(res, 200, { ok: true });
+      return json(res, 200, { ok: true, mode: 'email_otp' });
+    }
+
+    if (action === 'verify-code') {
+      const email = cleanEmail(req.body?.email);
+      const token = cleanOtp(req.body?.token);
+      if (!email) return json(res, 400, { error: 'Adresse courriel invalide.' });
+      if (!token) return json(res, 400, { error: 'Le code doit contenir 6 chiffres.' });
+      const session = await supabaseFetch('/auth/v1/verify', {
+        method: 'POST',
+        body: JSON.stringify({ email, token, type: 'email' })
+      });
+      const accessToken = String(session?.access_token || '');
+      const user = session?.user || (accessToken ? await getUser(accessToken) : null);
+      if (!accessToken || !user) return json(res, 401, { error: 'Code invalide ou expiré.' });
+      const accountType = req.body?.account_type === 'professionnel' ? 'professionnel' : 'particulier';
+      const marketingConsent = accountType === 'particulier' && req.body?.marketing_consent === true;
+      const profile = await syncProfile(accessToken, user, {
+        account_type: accountType,
+        marketing_consent: marketingConsent,
+        marketing_consent_at: marketingConsent ? new Date().toISOString() : null
+      });
+      return json(res, 200, {
+        ok: true,
+        session: {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token || '',
+          expires_in: session.expires_in || 3600,
+          expires_at: session.expires_at || 0,
+          token_type: session.token_type || 'bearer'
+        },
+        user: {
+          id: user.id,
+          email: user.email,
+          created_at: user.created_at,
+          user_metadata: user.user_metadata || {}
+        },
+        profile
+      });
     }
 
     if (action === 'me') {
