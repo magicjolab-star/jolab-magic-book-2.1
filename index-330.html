@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050a15">
+  <meta name="application-version" content="3.3.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Magic Book">
+  <meta name="description" content="Magic Book — évaluateur d'échange intelligent pour véhicules de loisirs.">
+  <link rel="manifest" href="/manifest.webmanifest?v=330">
+  <link rel="icon" type="image/webp" sizes="192x192" href="/api/visual?size=192&v=330">
+  <link rel="apple-touch-icon" href="/api/visual?size=192&v=330">
+  <title>Magic Book 3.3</title>
+  <link rel="stylesheet" href="/style-330.css?v=330">
+</head>
+<body>
+<main class="app">
+  <header class="head">
+    <img class="hero" src="/api/visual?size=512&v=330" alt="Magic Book" width="512" height="512" decoding="async" fetchpriority="high">
+    <h1>MAGIC BOOK</h1>
+    <div class="sub" data-i18n="subtitle">Évaluateur d'échange intelligent pour véhicules de loisirs</div>
+    <div class="version">Version 3.3.0</div>
+    <a class="pro-link" href="/commercial.html" data-i18n="proLink">🏢 Professionnel? Découvrir Commercial Magic Book</a>
+  </header>
+
+  <div class="top-tools">
+    <div class="toolbox"><label for="language" data-i18n="language">Langue</label><select id="language"><option value="fr">Français</option><option value="en">English</option></select></div>
+    <div class="toolbox"><label data-i18n="currency">Devise</label><input value="CAD — $" disabled></div>
+  </div>
+
+  <section id="historyPanel" class="history-panel">
+    <div class="history-head"><div><h2 data-i18n="historyTitle">🕘 Dernières évaluations</h2><div class="fine" data-i18n="historyNote">Conservées sur cet appareil. Tu peux revoir ou modifier une recherche sans tout recommencer.</div></div><button id="clearHistory" class="mini secondary" type="button" data-i18n="clearHistory">Effacer</button></div>
+    <div id="historyList" class="history-list"></div>
+  </section>
+
+  <div class="install-panel"><button id="install" class="install" type="button" data-i18n="install">📲 Installer l'application</button><div id="installStatus" class="install-status" data-i18n="installStatus">Si Chrome ne lance pas l'installation automatiquement, touche le bouton pour afficher la méthode manuelle.</div><div id="installHelp" class="help"><b data-i18n="installHelpTitle">Installation sur l'écran d'accueil :</b><div id="steps"></div></div></div>
+
+  <section id="form">
+    <div class="grid"><div class="fg"><label for="marque" data-i18n="brand">Marque</label><select id="marque"></select></div><div class="fg"><label for="modele" data-i18n="model">Modèle</label><input id="modele" placeholder="Ex: Wolverine, General, YZ125..." autocomplete="off"></div></div>
+    <div class="grid"><div class="fg"><label for="annee" data-i18n="year">Année</label><input id="annee" type="number" inputmode="numeric" placeholder="Ex: 2024"></div><div class="fg"><label data-i18n="usage">Millage / utilisation</label><div class="usage-grid"><input id="millage" type="number" inputmode="numeric" placeholder="Ex: 2500"><select id="usageUnit"><option value="km">km</option><option value="h">h</option></select></div></div></div>
+    <div class="fg"><label for="accessoires" data-i18n="accessories">Accessoires ajoutés</label><select id="accessoires" multiple></select><div class="accessory-help" data-i18n="accessoryHelp">La valeur des accessoires est dépréciée selon l'âge et la condition de la machine, puis plafonnée pour éviter de surévaluer un véhicule très équipé.</div><div id="accessoryImpact" class="accessory-impact"></div></div>
+    <div class="fg"><label for="autres" data-i18n="otherAccessories">Autres accessoires / Notes</label><input id="autres" placeholder="Ex: accessoires non listés, modifications particulières..." autocomplete="off"></div>
+    <div class="fg"><label data-i18n="condition">Condition de la machine</label><div class="conditions"><label class="cond active"><input type="radio" name="condition" value="excellent" checked><b>🌟 <span data-i18n="excellent">Excellent</span></b><small data-i18n="excellentNote">Prêt salle de montre</small></label><label class="cond"><input type="radio" name="condition" value="moyen"><b>🔧 <span data-i18n="average">Moyen</span></b><small data-i18n="averageNote">Inspection & ajustements</small></label><label class="cond"><input type="radio" name="condition" value="passable"><b>⚠️ <span data-i18n="fair">Passable</span></b><small data-i18n="fairNote">Budget à prévoir</small></label></div></div>
+    <button id="go" class="action" type="button" data-i18n="generate">Générer l'analyse du marché ⚡</button>
+  </section>
+
+  <div id="loader" class="loader" data-i18n="loading">Analyse du marché québécois en cours...</div><div id="err" class="err"></div>
+  <section id="results" class="results"><div id="cards"></div><div class="result-actions"><button id="printBtn" class="action print" type="button" data-i18n="print">🖨️ Imprimer mon résultat</button><button id="editBtn" class="action secondary-action" type="button" data-i18n="editResult">✏️ Modifier cette évaluation</button><button id="reset" class="action secondary-action" type="button" data-i18n="reset">Nouvelle évaluation</button></div></section>
+
+  <footer class="foot"><b>By Magic Jolab</b><div class="note"><span data-i18n="disclaimer">Estimation assistée par IA. Les montants doivent être validés par un professionnel avant une offre d'achat ou d'échange.</span><br><a class="privacy-link" href="/privacy.html" data-i18n="privacy">Politique de confidentialité</a></div></footer>
+</main>
+<script src="/data-330.js?v=330" defer></script>
+<script src="/app-330.js?v=330" defer></script>
+</body>
+</html>
