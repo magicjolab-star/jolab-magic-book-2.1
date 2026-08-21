@@ -1,5 +1,5 @@
-const CACHE_NAME = 'magic-book-v304';
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest?v=304'];
+const CACHE_NAME = 'magic-book-v310';
+const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest?v=310'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
@@ -7,9 +7,7 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
-  );
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))));
   self.clients.claim();
 });
 
@@ -19,28 +17,20 @@ self.addEventListener('fetch', event => {
   if (url.pathname.startsWith('/api/') || event.request.method !== 'GET') return;
 
   if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request, { cache: 'no-store' })
-        .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put('/index.html', copy));
-          return response;
-        })
-        .catch(() => caches.match('/index.html'))
-    );
+    event.respondWith(fetch(event.request, { cache: 'no-store' }).then(response => {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put('/index.html', copy));
+      return response;
+    }).catch(() => caches.match('/index.html')));
     return;
   }
 
   if (url.pathname === '/manifest.webmanifest') {
-    event.respondWith(
-      fetch(event.request, { cache: 'reload' })
-        .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
+    event.respondWith(fetch(event.request, { cache: 'reload' }).then(response => {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+      return response;
+    }).catch(() => caches.match(event.request)));
     return;
   }
 
