@@ -35,10 +35,12 @@ const el=id=>document.getElementById(id),L=()=>typeof lang!=='undefined'&&lang==
 function normalize(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
 function detectVehicleType(){const brand=normalize(el('marque')?.value),model=normalize(el('modele')?.value);const m=` ${model} `;
  if(/\b(ponton|pontoon|bowrider|deck boat|chaloupe|bateau)\b/.test(m))return'boat';
+ if(brand==='yamaha'&&/\b(fx|vx|gp|jetblaster|jet blaster|superjet)\b/.test(m))return'pwc';
+ if(brand==='kawasaki'&&/\b(ultra|stx|jet ski)\b/.test(m))return'pwc';
  if(/\b(waverunner|wave runner|jetblaster|jet blaster|superjet|gp1800|gp svho|fx svho|fx ho|spark|gti|gtx|rxt|rxp|fish pro|wake pro|jet ski)\b/.test(m)||/\b(vx|stx 160|ultra 310)\b/.test(m))return'pwc';
  if(/\b(sidewinder|srx|viper|phazer|apex|vector|nytro|mountain max|rmk|switchback|indy|norseman|thundercat|riot|blast|pantera)\b/.test(m)||/\bzr\s?\d/.test(m))return'snow';
- if(/\b(grizzly|kodiak|raptor|yfz|wolverine|viking|yxz|rhino|sportsman|scrambler|ranger|rzr|general|outlaw|outlander|defender|maverick|commander|rancher|foreman|rubicon|rincon|trx|talon|pioneer|brute force|teryx|mule|kfx|kingquad|quadsport|ltz|lt-z|alterra|prowler|wildcat|pathcross|workcross)\b/.test(m))return'offroad';
- if(/\b(yz\s?\d|wr\s?\d|tenere|mt[- ]?\d|yzf-r|xsr|tracer|crf|cbr|rebel|africa twin|gold ?wing|grom|kx\s?\d|klx|ninja|versys|vulcan|eliminator|rm-z|rmz|gsx|v-strom|dr-z|drz|hayabusa|boulevard|duke|adventure|exc|sx|xc|smr|vitpilen|svartpilen|spyder|ryker|street glide|road glide|sportster|pan america|softail)\b/.test(m))return'moto';
+ if(/\b(grizzly|kodiak|raptor|wolverine|viking|yxz|rhino|sportsman|scrambler|ranger|rzr|general|outlaw|outlander|defender|maverick|commander|rancher|foreman|rubicon|rincon|talon|pioneer|brute force|teryx|mule|kingquad|quadsport|alterra|prowler|wildcat|pathcross|workcross)\b/.test(m)||/\b(yfz|trx|kfx|ltz|lt-z)\d/.test(m))return'offroad';
+ if(/\b(tenere|xsr|tracer|rebel|africa twin|gold ?wing|grom|ninja|versys|vulcan|eliminator|rm-z|rmz|gsx|v-strom|dr-z|drz|hayabusa|boulevard|duke|adventure|exc|sx|xc|smr|vitpilen|svartpilen|spyder|ryker|street glide|road glide|sportster|pan america|softail)\b/.test(m)||/\b(yz|wr|mt|crf|cbr|cb|kx|klx)\s?-?\d/.test(m))return'moto';
  if(['princecraft','g3 boats','lund','crestliner','commere','sylvan','starcraft','bennington'].includes(brand))return'boat';
  if(brand==='sea-doo')return'pwc';if(brand==='ski-doo')return'snow';
  if(['harley-davidson','bmw motorrad','ktm','husqvarna','gasgas'].includes(brand))return'moto';
